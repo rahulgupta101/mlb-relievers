@@ -494,16 +494,6 @@ def build_html(reliever_stats, reliever_recent, pitch_mix_rel, pitch_mix_sp, loo
     <input type="text" id="pmSearch" placeholder="Search name or team..." oninput="renderPitchMix()" />
     <div><label>Team&nbsp;</label>
       <select id="pmTeam" onchange="renderPitchMix()"><option value="">All teams</option></select></div>
-    <div><label>Pitch type&nbsp;</label>
-      <select id="pmPitchType" onchange="renderPitchMix()"><option value="">All pitches</option></select></div>
-    <div><label>Min pitches&nbsp;</label>
-      <select id="pmMinPitches" onchange="renderPitchMix()">
-        <option value="20">20+</option>
-        <option value="50">50+</option>
-        <option value="100">100+</option>
-        <option value="200">200+</option>
-        <option value="300">300+</option>
-      </select></div>
     <div class="toggle-group">
       <button class="toggle-btn active" data-hand="all" onclick="setHand(this)">All batters</button>
       <button class="toggle-btn"        data-hand="R"   onclick="setHand(this)">vs RHB</button>
@@ -684,11 +674,6 @@ function populatePmFilters() {{
   const allTeams = [...new Set(data.map(d => d.team))].sort();
   pmTeam.innerHTML = '<option value="">All teams</option>' +
     allTeams.map(t => `<option value="${{t}}">${{t}}</option>`).join("");
-
-  const pmPitchType = document.getElementById("pmPitchType");
-  const allTypes = [...new Set(data.flatMap(d => d.pitches_all.map(p => p.type)))].sort();
-  pmPitchType.innerHTML = '<option value="">All pitches</option>' +
-    allTypes.map(t => `<option value="${{t}}">${{t}}</option>`).join("");
 }}
 
 function getPitchList(pitcher) {{
@@ -703,15 +688,11 @@ function getPitchList(pitcher) {{
 function renderPitchMix() {{
   const q         = normalizeString(document.getElementById("pmSearch").value.toLowerCase());
   const team      = document.getElementById("pmTeam").value;
-  const pitchType = document.getElementById("pmPitchType").value;
-  const minP      = parseInt(document.getElementById("pmMinPitches").value);
   const data      = currentPitchData();
 
   let filtered = data.filter(d => {{
-    if (d.total < minP) return false;
     if (q && !normalizeString(d.name.toLowerCase()).includes(q) && !normalizeString(d.team.toLowerCase()).includes(q)) return false;
     if (team && d.team !== team) return false;
-    if (pitchType && !d.pitches_all.some(p => p.type === pitchType)) return false;
     if (currentCat && !d.pitches_all.some(p => p.category === currentCat)) return false;
     return true;
   }});
@@ -729,7 +710,6 @@ function renderPitchMix() {{
 
   grid.innerHTML = filtered.map(pitcher => {{
     let pitches = getPitchList(pitcher);
-    if (pitchType) pitches = pitches.filter(p => p.type === pitchType);
 
     // calculate category stats based on filtered pitches
     const catStats = {{"FB": {{count: 0, velo: 0}}, "BR": {{count: 0, velo: 0}}, "OS": {{count: 0, velo: 0}}}};
@@ -759,7 +739,6 @@ function renderPitchMix() {{
       const color = PITCH_COLORS[p.type] || "#888780";
       const velo  = p.avg_velo != null ? `<span class="pitch-stat-val">${{p.avg_velo}}</span> mph` : "—";
       const maxV  = p.max_velo != null ? `max <span class="pitch-stat-val">${{p.max_velo}}</span>` : "";
-      const spin  = p.avg_spin != null ? `<span class="pitch-stat-val">${{p.avg_spin.toLocaleString()}}</span> rpm` : "—";
       const usage = p[usageKey] != null ? p[usageKey].toFixed(1) : p.usage.toFixed(1);
       const barW  = Math.min(parseFloat(usage), 100).toFixed(1);
       return `
@@ -768,7 +747,6 @@ function renderPitchMix() {{
             <span class="pitch-label" style="color:${{color}}">${{p.name}}</span>
             <div class="pitch-stats">
               ${{velo}} ${{maxV ? "· " + maxV : ""}}
-              · ${{spin}}
               · <span class="pitch-stat-val">${{usage}}%</span>
             </div>
           </div>
