@@ -8,15 +8,15 @@ warnings.filterwarnings("ignore")
 
 cache.enable()
 
-SEASON        = 2025
+SEASON        = 2026
 LOOKBACK_DAYS = 14
 MIN_BF        = 30
 
 # ─── DATA PULL ────────────────────────────────────────────────────────────────
 
 def get_season_statcast(season):
-    start = f"{season}-03-20"
-    end   = date.today().strftime("%Y-%m-%d")
+    start = f"{season}-03-27"   # 2026 MLB Opening Day
+    end   = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")  # through yesterday
     print(f"Pulling Statcast {start} → {end} ...")
     df = statcast(start_dt=start, end_dt=end)
     if df is None or df.empty:
