@@ -2,8 +2,8 @@ name: Update Reliever Dashboard
 
 on:
   schedule:
-    - cron: '0 14 * * *'   # 9am ET daily
-  workflow_dispatch:         # manual trigger button in GitHub UI
+    - cron: '0 14 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,6 +23,14 @@ jobs:
 
       - name: Run dashboard script
         run: python relievers.py
+
+      - name: Check index.html was created
+        run: |
+          if [ ! -f index.html ]; then
+            echo "ERROR: index.html was not generated"
+            exit 1
+          fi
+          echo "index.html found, size: $(wc -c < index.html) bytes"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
