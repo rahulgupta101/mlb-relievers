@@ -1,0 +1,32 @@
+name: Update Reliever Dashboard
+
+on:
+  schedule:
+    - cron: '0 14 * * *'   # 9am ET daily
+  workflow_dispatch:         # manual trigger button in GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install pybaseball pandas numpy
+
+      - name: Run dashboard script
+        run: python relievers.py
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          publish_branch: gh-pages
