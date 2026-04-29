@@ -194,8 +194,8 @@ def build_html(reliever_stats, reliever_recent, pitch_mix_rel, pitch_mix_sp, loo
         consec = int(r.get("consec", 0))
         rest   = int(r.get("days_rested", 99))
         if consec >= 3:   status, sc = "FATIGUED",   "#A32D2D"
-        elif consec == 2: status, sc = "USED",        "#BA7517"
-        elif rest == 0:   status, sc = "USED TODAY",  "#BA7517"
+        elif consec == 2: status, sc = "USED B2B",        "#BA7517"
+        elif rest == 0:   status, sc = "USED YESTERDAY",  "#BA7517"
         elif rest >= 3:   status, sc = "FRESH",       "#0F6E56"
         else:             status, sc = "NORMAL",      "#888780"
 
